@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Periodic Table</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Interactive Periodic Table</h1>
+    <div id="table"></div>
+    
+    <div id="element-info" class="hidden">
+        <h2 id="element-name"></h2>
+        <p id="element-details"></p>
+        <button onclick="closeInfo()">Close</button>
+    </div>
+
+    <h2>🔬 Element Puzzle Game</h2>
+    <p>Match the element symbol to its correct name!</p>
+    <div id="quiz">
+        <select id="symbol-select"></select>
+        <select id="name-select"></select>
+        <button onclick="checkAnswer()">Check</button>
+        <p id="quiz-result"></p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    color: #333;
+}
+
+#table {
+    display: grid;
+    grid-template-columns: repeat(18, 50px);
+    gap: 5px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.element {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #000;
+    text-align: center;
+    line-height: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.element:hover {
+    transform: scale(1.1);
+    box-shadow: 0px 0px 10px rgba(0, 0, 255, 0.5);
+}
+
+.metal { background-color: lightcoral; }
+.nonmetal { background-color: lightgreen; }
+.noble-gas { background-color: lightskyblue; }
+.metalloid { background-color: lightgoldenrodyellow; }
+
+#element-info {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border: 2px solid black;
+    display: none;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.hidden {
+    display: none;
+}
+
+#quiz {
+    margin-top: 20px;
+}
+
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+const elements = [
+    { symbol: "H", name: "Hydrogen", number: 1, group: "nonmetal" },
+    { symbol: "He", name: "Helium", number: 2, group: "noble-gas" },
+    { symbol: "Li", name: "Lithium", number: 3, group: "metal" },
+    { symbol: "Be", name: "Beryllium", number: 4, group: "metal" },
+    { symbol: "B", name: "Boron", number: 5, group: "metalloid" },
+    { symbol: "C", name: "Carbon", number: 6, group: "nonmetal" },
+    { symbol: "N", name: "Nitrogen", number: 7, group: "nonmetal" },
+    { symbol: "O", name: "Oxygen", number: 8, group: "nonmetal" },
+    { symbol: "F", name: "Fluorine", number: 9, group: "nonmetal" },
+    { symbol: "Ne", name: "Neon", number: 10, group: "noble-gas" }
+];
+
+const table = document.getElementById("table");
+
+// Create periodic table elements
+elements.forEach((el) => {
+    let div = document.createElement("div");
+    div.classList.add("element", el.group);
+    div.innerText = el.symbol;
+    div.onclick = () => showElementInfo(el);
+    table.appendChild(div);
+});
+
+function showElementInfo(el) {
+    document.getElementById("element-name").innerText = ${el.name} (Atomic No. ${el.number});
+    document.getElementById("element-details").innerText = Group: ${el.group.replace("-", " ")};
+    document.getElementById("element-info").style.display = "block";
+}
+
+function closeInfo() {
+    document.getElementById("element-info").style.display = "none";
+}
+
+// 🎯 Puzzle Game - Match the symbol with the correct element name
+const symbolSelect = document.getElementById("symbol-select");
+const nameSelect = document.getElementById("name-select");
+
+// Populate dropdowns with elements
+elements.forEach(el => {
+    let symbolOption = document.createElement("option");
+    symbolOption.value = el.symbol;
+    symbolOption.innerText = el.symbol;
+    symbolSelect.appendChild(symbolOption);
+
+    let nameOption = document.createElement("option");
+    nameOption.value = el.name;
+    nameOption.innerText = el.name;
+    nameSelect.appendChild(nameOption);
+});
+
+// Shuffle dropdown order
+function shuffleOptions(select) {
+    for (let i = select.options.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [select.options[i], select.options[j]] = [select.options[j], select.options[i]];
+    }
+}
+shuffleOptions(symbolSelect);
+shuffleOptions(nameSelect);
+
+// Check the answer
+function checkAnswer() {
+    let selectedSymbol = symbolSelect.value;
+    let selectedName = nameSelect.value;
+    let correctElement = elements.find(el => el.symbol === selectedSymbol);
+
+    if (correctElement.name === selectedName) {
+        document.getElementById("quiz-result").innerText = "✅ Correct!";
+    } else {
+        document.getElementById("quiz-result").innerText = "❌ Try Again!";
+    }
+}
